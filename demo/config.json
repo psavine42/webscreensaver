@@ -1,0 +1,14 @@
+{
+    "test": {
+        "timeout": 0.01,
+        "url": "https://google.com",
+        "delay": 7,
+        "logdir":""
+    },
+    "run": {
+        "timeout": 20,
+        "url": "https://tocci.com",
+        "delay": 7,
+        "logdir":""
+    }
+}
