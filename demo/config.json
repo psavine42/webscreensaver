@@ -1,13 +1,13 @@
 {
     "test": {
-        "timeout": 0.01,
-        "url": "https://google.com",
-        "delay": 7,
-        "logdir":""
+        "timeout": 0.01,                    //how long to wait before screen saver starts (minutes)
+        "url": "https:///www.google.com",   // url to show
+        "delay": 7,                         // if multuiple monitors, start next one after (seconds)
+        "logdir":""                         // custom place to send logfiles to (blank sends to appdata)
     },
     "run": {
         "timeout": 20,
-        "url": "https://tocci.com",
+        "url": "https://www.tocci.com",
         "delay": 7,
         "logdir":""
     }

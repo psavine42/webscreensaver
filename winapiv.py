@@ -25,7 +25,7 @@ from taskbar import hide_taskbar, unhide_taskbar
 
 
 mozilla = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"
-gecko = './deps/geckodriver.exe'
+gecko = 'geckodriver.exe'
 
 
 def init_logging(path):
@@ -43,7 +43,7 @@ def init_logging(path):
     logging.info('starting jobcam screensaver at {}'.format(file_path))
 
 
-def open_ff_browser(_url, n):
+def open_ff_browser(url, n):
     options = webdriver.FirefoxOptions()
     binary = FirefoxBinary(gecko)
     fp = webdriver.FirefoxProfile()
@@ -53,7 +53,7 @@ def open_ff_browser(_url, n):
     driver = webdriver.Firefox(capabilities=firefox_capabilities)
     driver.set_window_position(n, 0)
     driver.fullscreen_window()
-    driver.get(_url)
+    driver.get(url)
     return driver
 
 
@@ -68,12 +68,12 @@ def close_browsers(_browsers):
     return _browsers
 
 
-def make_browsers(_url, delay, init_state):
+def make_browsers(url, delay, init_state):
     browsers = []
     hide_taskbar()
     for m in get_monitors():
         logging.info('launching : ' + str(m))
-        browsers.append(open_ff_browser(_url, m.x))
+        browsers.append(open_ff_browser(url, m.x))
         t = 0
         while t <= delay:
             time.sleep(1)
@@ -86,7 +86,7 @@ def make_browsers(_url, delay, init_state):
     return browsers, init_state
 
 
-def sleep_timer(_url, time_out, delay):
+def sleep_timer(url, time_out, delay):
     timer, last_state, browsers = 0, '', None
     while True:
         try:
@@ -98,16 +98,16 @@ def sleep_timer(_url, time_out, delay):
             else: 
                 timer +=  1 
             if timer > time_out and browsers is None:
-                browsers, last_state = make_browsers(_url, delay, last_state)
+                browsers, last_state = make_browsers(url, delay, last_state)
             time.sleep(1)
-        except Exception:
-            logging.info('exception')
+        except Exception as err:
+            logging.info('exception' + str(err))
             browsers = close_browsers(browsers)
 
 
 def parse_config(args):
-    def parse_cfg(args, cfgs, k, d=''):
-        return arg.get(k) if arg.get(k, d) != d else cfgs.get(k)
+    def parse_cfg(arg, cfgs, k, d=''):
+        return arg.get(k) if arg.get(k, d) != d else cfgs.get(k, d)
 
     with open(args.cfg_folder + '/config.json') as f:
         data = json.load(f)
@@ -115,20 +115,20 @@ def parse_config(args):
     cfg = data.get(args.act, None)
     if cfg is None:
         print('config file not found')
-        return args.url, abs(args.time_out  * 60), args.delay, ''
+        return args.url, int(abs(args.time_out  * 60)), args.delay, ''
 
     arg = vars(args)
     url = parse_cfg(arg, cfg, 'url', '')
     delay = parse_cfg(arg, cfg, 'delay', -1)
     logdir = parse_cfg(arg, cfg, 'logdir', '')
     timeout = parse_cfg(arg, cfg, 'timeout', -1)
-    return url, timeout * 60, delay, logdir
+    return url, int(abs(timeout * 60)), delay, logdir
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='browser screensaver')
     parser.add_argument('-a', '--act', type=str, default='run')
-    parser.add_argument('-f', '--cfg_folder', type=str, default='prod')
+    parser.add_argument('-f', '--cfg_folder', type=str, default='./prod')
     parser.add_argument('-t', '--timeout', type=int, default=-1, help='how long to wait before starting screensaver')
     parser.add_argument('-d', '--delay', type=int, default=-1, help='If there are multiple screens, how long to wait between starting each one')
     parser.add_argument('-l', '--logdir', type=str, default='', help='location to log to')
@@ -139,6 +139,8 @@ if __name__ == '__main__':
     
     url, timeout, delay, logdir = parse_config(args)
     init_logging(logdir)
+    logging.info('starting process url:{}, timeout:{}, delay:{}, dir:{}'
+        .format(url, timeout, delay, logdir))
     sleep_timer(url, timeout, delay)
 
 
