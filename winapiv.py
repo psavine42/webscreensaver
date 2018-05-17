@@ -24,7 +24,6 @@ from selenium.webdriver.remote.remote_connection import LOGGER
 from taskbar import hide_taskbar, unhide_taskbar 
 
 
-# url = 'http://192.168.60.145:8000/jobcams.html'
 mozilla = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"
 gecko = './deps/geckodriver.exe'
 
